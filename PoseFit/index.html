@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PoseFit</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <header class="header">
+    <a class="logo">PoseFit</a>
+    <button class="menu-button" id="menuButton">☰</button>
+    <nav class="nav" id="navMenu">
+      <a href="#">Inicio</a>
+      <a href="#analizar">Analizar</a>
+      <a href="#resultados">Resultados</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Analiza tu técnica usando videos</h1>
+        <p class="hero-text">
+          Graba en <strong>vista lateral</strong> y sube el video para recibir
+          retroalimentación detallada con análisis de ángulos corporales
+          mediante inteligencia artificial.
+        </p>
+        <a href="#analizar" class="primary-link">Comenzar</a>
+      </div>
+    </section>
+
+    <section class="app-layout" id="analizar">
+
+      <!-- Panel izquierdo: carga del ejercicio -->
+      <section class="panel">
+
+        <div class="section-heading">
+          <p class="section-kicker">Carga</p>
+          <h2>Subir ejercicio</h2>
+        </div>
+
+        <div class="lateral-tip">
+          📐 Graba siempre en <strong>vista lateral</strong> para un análisis preciso de ángulos.
+        </div>
+
+        <div class="form-group">
+          <label>Ejercicio</label>
+          <select id="exercise">
+            <option value="sentadilla">Sentadilla</option>
+            <option value="flexion">Flexión</option>
+            <option value="abdominal">Abdominales</option>
+          </select>
+        </div>
+
+        <div class="upload-box">
+          <div class="upload-icon">🎥</div>
+          <label for="videoInput" class="file-label">Seleccionar video</label>
+          <input id="videoInput" type="file" accept=".mp4,.mov,.webm">
+        </div>
+
+        <div class="video-preview" id="previewBox">
+          <h3>Vista previa</h3>
+          <video id="preview" controls></video>
+        </div>
+
+        <!-- Canvas oculto usado por mediapipe-engine.js -->
+        <canvas id="poseCanvas" style="display:none;"></canvas>
+
+        <div class="button-row">
+          <button class="btn btn-primary"   id="analyze">Analizar</button>
+          <button class="btn btn-secondary" id="clear">Limpiar</button>
+        </div>
+
+      </section>
+
+      <!-- Panel derecho: resultados -->
+      <aside class="panel" id="resultados">
+        <div class="feedback">
+          <h3>Resultados</h3>
+
+          <!-- Estado: sin video cargado -->
+          <div id="feedbackEmpty">
+            <ul id="feedback">
+              <li>Sube un video lateral para comenzar el análisis.</li>
+            </ul>
+          </div>
+
+          <!-- Estado: procesando -->
+          <div id="feedbackLoading" style="display:none;">
+            <div class="loading-box">
+              <div class="spinner"></div>
+              <p class="loading-text" id="loadingText">Inicializando MediaPipe…</p>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progressBar"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado: resultados disponibles -->
+          <div id="feedbackResults" style="display:none;">
+
+            <div class="score-box">
+              <span class="score-label">Puntuación general</span>
+              <span class="score-value" id="scoreValue">--</span>
+              <span class="score-suffix">/100</span>
+            </div>
+
+            <p class="side-badge" id="sideDetected" style="display:none;"></p>
+
+            <div class="result-section">
+              <h4 class="result-title">📐 Ángulos detectados</h4>
+              <ul class="result-list" id="anglesList"></ul>
+            </div>
+
+            <div class="result-section">
+              <h4 class="result-title">⚠️ Errores detectados</h4>
+              <ul class="result-list" id="errorsList"></ul>
+            </div>
+
+            <div class="result-section">
+              <h4 class="result-title">✅ Puntos positivos</h4>
+              <ul class="result-list" id="positivesList"></ul>
+            </div>
+
+            <div class="result-section">
+              <h4 class="result-title">💡 Consejos de mejora</h4>
+              <ul class="result-list" id="tipsList"></ul>
+            </div>
+
+          </div>
+        </div>
+      </aside>
+
+    </section>
+  </main>
+
+  <footer class="footer">PoseFit — Análisis de técnica deportiva</footer>
+
+  <!--
+    Orden de carga de scripts (cada archivo depende de los anteriores):
+    1. MediaPipe Pose (CDN)   → expone la clase global `Pose`
+    2. landmarks.js           → constante LM (índices de puntos corporales)
+    3. geometry.js            → funciones matemáticas de ángulos
+    4. side-detector.js       → detecta qué lado mira la cámara
+    5. exercises/*.js         → un analizador por ejercicio
+    6. mediapipe-engine.js    → motor: procesa el video y llama a los analizadores
+    7. ui.js                  → eventos del DOM y renderizado de resultados
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+  <script src="js/landmarks.js"></script>
+  <script src="js/geometry.js"></script>
+  <script src="js/side-detector.js"></script>
+
+  <script src="js/exercises/sentadilla.js"></script>
+  <script src="js/exercises/flexion.js"></script>
+  <script src="js/exercises/abdominal.js"></script>
+
+  <script src="js/mediapipe-engine.js"></script>
+  <script src="js/ui.js"></script>
+
+</body>
+</html>
